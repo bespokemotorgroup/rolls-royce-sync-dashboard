@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RR Content Sync — Admin Dashboard
 
-## Getting Started
+A Next.js admin UI over the `rolls-royce-content-scraper` sync service's Postgres database:
+reviewing pending field mappings, watching sync runs, inspecting detected changes, and browsing
+saved page templates.
 
-First, run the development server:
+This app talks **directly to the sync service's Postgres database** (via `pg`) from server-side
+code only. It does not call the sync service's API, Railway, or Payload — it only reads (and, for
+mapping approve/reject, writes a single `status` column) against the shared database.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Setup
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. Copy the env file and fill in real values:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+   ```bash
+   cp .env.example .env.local
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   - `SYNC_DATABASE_URL` — the same Neon Postgres connection string the sync service uses
+     (`sslmode=require`). Get this from the sync service's own `.env` / Railway variables.
+   - `DASHBOARD_PASSWORD` — the shared password for the login gate.
+   - `AUTH_SECRET` — random secret used to sign the session cookie. Generate with
+     `openssl rand -hex 32`.
 
-## Learn More
+2. Install dependencies and run the dev server:
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   npm install
+   npm run dev
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. Visit `http://localhost:3000`, sign in with `DASHBOARD_PASSWORD`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deploying to Vercel
 
-## Deploy on Vercel
+Set `SYNC_DATABASE_URL`, `DASHBOARD_PASSWORD`, and `AUTH_SECRET` as environment variables in the
+Vercel project settings, then deploy as a normal Next.js app. No other services or credentials are
+required — this dashboard does not need `STAGING_PAYLOAD_URL`, Payload credentials, or
+`SYNC_ADMIN_TOKEN`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Screens
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Overview** — latest sync run, pending mapping counts, recent failures.
+- **Runs** — full sync run history; click a run to see its recorded errors.
+- **Pending Mappings** — the main review queue (`field_mappings WHERE status = 'pending'`),
+  grouped by source page, with per-row and bulk approve/reject actions.
+- **Recent Changes** — detected diffs (`change_events`) with previous/current field values and
+  whether Payload blocked the change.
+- **Templates** — saved block-structure stencils (`page_templates`).
+
+## Safety notes
+
+- Single shared password gate via a signed HttpOnly cookie (`src/middleware.ts`,
+  `src/lib/auth.ts`) — every route except `/login` and `/api/login` requires a valid session.
+- `SYNC_DATABASE_URL` is only ever read in server-side code (`src/lib/db.ts`) — never sent to the
+  client.
+- The only write path is `UPDATE field_mappings SET status = ...` (see
+  `src/app/(dashboard)/mappings/actions.ts`). There is no delete UI and no raw SQL console.
+- Triggering a sync run on demand is intentionally out of scope for v1 (the sync service runs as
+  a Railway Cron Job with no always-on API to call).
