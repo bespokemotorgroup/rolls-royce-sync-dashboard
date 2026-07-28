@@ -2,6 +2,7 @@ import Link from "next/link";
 import { query } from "@/lib/db";
 import type { PageTemplate } from "@/lib/types";
 import { formatDateTime } from "@/lib/format";
+import { PageHeader } from "@/components/PageHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -16,12 +17,10 @@ export default async function TemplatesPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold text-neutral-100">Page templates</h1>
-        <p className="text-sm text-neutral-500">
-          Saved block-structure stencils used to auto-populate new pages.
-        </p>
-      </div>
+      <PageHeader
+        title="Page templates"
+        description="Saved block-structure stencils used to auto-populate new pages."
+      />
 
       <div className="overflow-x-auto rounded-lg border border-neutral-800">
         <table className="w-full text-left text-sm">

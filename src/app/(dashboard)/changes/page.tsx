@@ -2,6 +2,7 @@ import { query } from "@/lib/db";
 import type { ChangeEvent } from "@/lib/types";
 import { formatDateTime } from "@/lib/format";
 import { StatusBadge } from "@/components/StatusBadge";
+import { PageHeader } from "@/components/PageHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -20,10 +21,10 @@ export default async function ChangesPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold text-neutral-100">Recent changes</h1>
-        <p className="text-sm text-neutral-500">Most recent 100 detected changes, newest first.</p>
-      </div>
+      <PageHeader
+        title="Recent changes"
+        description="Most recent 100 detected changes, newest first, across every status. For changes still needing a decision, use the Review Queue."
+      />
 
       {changes.length === 0 && (
         <p className="text-sm text-neutral-500">No changes recorded yet.</p>

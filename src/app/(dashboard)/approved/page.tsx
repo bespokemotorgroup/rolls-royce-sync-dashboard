@@ -2,6 +2,7 @@ import { query } from "@/lib/db";
 import type { ChangeEvent } from "@/lib/types";
 import { formatDateTime } from "@/lib/format";
 import { DiffFieldView } from "@/components/DiffFieldView";
+import { PageHeader } from "@/components/PageHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -20,18 +21,21 @@ export default async function ApprovedPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold text-neutral-100">Approved, awaiting publish</h1>
-        <p className="text-sm text-neutral-500">
-          Approved by a reviewer but not yet published — will be picked up on the next sync run
-          (twice weekly, or a manual trigger). The sync service re-verifies the page is still
-          accurate before publishing; if the official site changed again, this will move to
-          "superseded" instead.
-        </p>
-      </div>
+      <PageHeader
+        title="Approved, awaiting publish"
+        description={
+          <>
+            Approved by a reviewer but not yet published — picked up on the next sync run (twice
+            weekly, or a manual trigger). The sync service re-checks the official page first; if
+            it changed again since approval, this moves to <em>superseded</em> instead of publishing.
+          </>
+        }
+      />
 
       {changes.length === 0 && (
-        <p className="text-sm text-neutral-500">Nothing waiting to be published.</p>
+        <p className="rounded-lg border border-neutral-800 bg-neutral-900 px-4 py-6 text-center text-sm text-neutral-500">
+          Nothing waiting to be published.
+        </p>
       )}
 
       <div className="space-y-4">

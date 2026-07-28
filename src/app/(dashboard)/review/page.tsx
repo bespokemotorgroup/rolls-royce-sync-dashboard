@@ -4,6 +4,7 @@ import { formatDateTime } from "@/lib/format";
 import { StatusBadge } from "@/components/StatusBadge";
 import { DiffFieldView } from "@/components/DiffFieldView";
 import { ReviewCard } from "./ReviewCard";
+import { PageHeader } from "@/components/PageHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -31,14 +32,22 @@ export default async function ReviewPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold text-neutral-100">Review queue</h1>
-        <p className="text-sm text-neutral-500">
-          {pendingCount} change{pendingCount === 1 ? "" : "s"} awaiting review, grouped by page.
-        </p>
-      </div>
+      <PageHeader
+        title="Review queue"
+        description={
+          <>
+            {pendingCount} change{pendingCount === 1 ? "" : "s"} detected on the official site,
+            awaiting your approval before they publish. Nothing here goes live until you approve
+            it — approving only queues it for the next sync run.
+          </>
+        }
+      />
 
-      {groups.size === 0 && <p className="text-sm text-neutral-500">Nothing pending review. 🎉</p>}
+      {groups.size === 0 && (
+        <p className="rounded-lg border border-neutral-800 bg-neutral-900 px-4 py-6 text-center text-sm text-neutral-500">
+          Nothing pending review. 🎉
+        </p>
+      )}
 
       <div className="space-y-8">
         {Array.from(groups.entries()).map(([sourcePageId, group]) => {

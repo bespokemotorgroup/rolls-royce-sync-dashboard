@@ -3,6 +3,7 @@ import type { ChangeEvent } from "@/lib/types";
 import { formatDateTime } from "@/lib/format";
 import { StatusBadge } from "@/components/StatusBadge";
 import { DiffFieldView } from "@/components/DiffFieldView";
+import { PageHeader } from "@/components/PageHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -22,14 +23,16 @@ export default async function HistoryPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold text-neutral-100">History</h1>
-        <p className="text-sm text-neutral-500">
-          What actually happened to reviewed changes — most recent 200, newest first.
-        </p>
-      </div>
+      <PageHeader
+        title="History"
+        description="What actually happened to reviewed changes — published, rejected, superseded, or blocked. Most recent 200, newest first."
+      />
 
-      {changes.length === 0 && <p className="text-sm text-neutral-500">Nothing here yet.</p>}
+      {changes.length === 0 && (
+        <p className="rounded-lg border border-neutral-800 bg-neutral-900 px-4 py-6 text-center text-sm text-neutral-500">
+          Nothing here yet.
+        </p>
+      )}
 
       <div className="space-y-4">
         {changes.map((change) => {

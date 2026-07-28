@@ -3,6 +3,7 @@ import { query } from "@/lib/db";
 import type { SyncRun } from "@/lib/types";
 import { formatDateTime } from "@/lib/format";
 import { StatusBadge } from "@/components/StatusBadge";
+import { PageHeader } from "@/components/PageHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -17,10 +18,7 @@ export default async function RunsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold text-neutral-100">Sync runs</h1>
-        <p className="text-sm text-neutral-500">Most recent 100 runs, newest first.</p>
-      </div>
+      <PageHeader title="Sync runs" description="Most recent 100 runs, newest first." />
 
       <div className="overflow-x-auto rounded-lg border border-neutral-800">
         <table className="w-full text-left text-sm">

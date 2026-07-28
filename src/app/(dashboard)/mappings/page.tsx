@@ -1,6 +1,7 @@
 import { query } from "@/lib/db";
 import type { FieldMapping } from "@/lib/types";
 import { PageGroup } from "./PageGroup";
+import { PageHeader } from "@/components/PageHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -27,15 +28,20 @@ export default async function MappingsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold text-neutral-100">Pending mappings</h1>
-        <p className="text-sm text-neutral-500">
-          {mappings.length} mapping{mappings.length === 1 ? "" : "s"} awaiting review, grouped by page.
-        </p>
-      </div>
+      <PageHeader
+        title="Pending mappings"
+        description={
+          <>
+            {mappings.length} mapping{mappings.length === 1 ? "" : "s"} awaiting review, grouped by page.
+            These decide where scraped fields land in Payload — separate from content-change approval.
+          </>
+        }
+      />
 
       {groups.size === 0 && (
-        <p className="text-sm text-neutral-500">Nothing pending review. 🎉</p>
+        <p className="rounded-lg border border-neutral-800 bg-neutral-900 px-4 py-6 text-center text-sm text-neutral-500">
+          Nothing pending review. 🎉
+        </p>
       )}
 
       <div className="space-y-6">
