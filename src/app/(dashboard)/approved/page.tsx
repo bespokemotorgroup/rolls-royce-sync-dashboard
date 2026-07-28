@@ -33,7 +33,7 @@ export default async function ApprovedPage() {
       />
 
       {changes.length === 0 && (
-        <p className="rounded-lg border border-neutral-800 bg-neutral-900 px-4 py-6 text-center text-sm text-neutral-500">
+        <p className="rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20 bg-neutral-900 px-4 py-6 text-center text-sm text-neutral-500">
           Nothing waiting to be published.
         </p>
       )}
@@ -44,7 +44,7 @@ export default async function ApprovedPage() {
           return (
             <section
               key={change.id}
-              className="rounded-lg border border-neutral-800 bg-neutral-900 p-4"
+              className="rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20 bg-neutral-900 p-4"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>

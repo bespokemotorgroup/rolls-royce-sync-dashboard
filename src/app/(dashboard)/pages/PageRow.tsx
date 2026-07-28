@@ -78,7 +78,7 @@ export function PageRow({
                     <h3 className="mb-2 mt-4 text-xs font-medium uppercase tracking-wide text-neutral-500">
                       Metadata
                     </h3>
-                    <pre className="overflow-x-auto rounded-md border border-neutral-800 bg-neutral-950 p-3 text-xs text-neutral-300">
+                    <pre className="overflow-x-auto rounded-lg border border-neutral-800/70 bg-neutral-950 p-3 text-xs text-neutral-300">
                       {JSON.stringify(page.metadata, null, 2)}
                     </pre>
                   </>
@@ -108,7 +108,7 @@ export function PageRow({
                 {snapshots.length === 0 ? (
                   <p className="text-sm text-neutral-500">No snapshots recorded yet.</p>
                 ) : (
-                  <div className="overflow-x-auto rounded-md border border-neutral-800">
+                  <div className="overflow-x-auto rounded-lg border border-neutral-800/70">
                     <table className="w-full text-left text-xs">
                       <thead className="bg-neutral-900 text-neutral-500">
                         <tr>

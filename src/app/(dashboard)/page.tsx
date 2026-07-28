@@ -92,7 +92,7 @@ export default async function OverviewPage() {
         </div>
       )}
 
-      <section className="rounded-lg border border-neutral-800 bg-neutral-900 p-6">
+      <section className="rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20 bg-neutral-900 p-6">
         <h2 className="mb-4 text-sm font-medium text-neutral-300">Most recent sync run</h2>
         {latestRun ? (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -159,7 +159,7 @@ export default async function OverviewPage() {
           )}
         </SummaryCard>
 
-        <section className="rounded-lg border border-neutral-800 bg-neutral-900 p-6 md:col-span-2">
+        <section className="rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20 bg-neutral-900 p-6 md:col-span-2">
           <h2 className="mb-4 text-sm font-medium text-neutral-300">Recent failures</h2>
           {recentFailures.length > 0 ? (
             <ul className="divide-y divide-neutral-800">

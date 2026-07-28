@@ -59,7 +59,7 @@ export function PageGroup({
   if (visible.length === 0) return null;
 
   return (
-    <section className="rounded-lg border border-neutral-800 bg-neutral-900">
+    <section className="rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20 bg-neutral-900">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-800 px-4 py-3">
         <div>
           <a
@@ -156,7 +156,7 @@ function MappingContent({ mapping }: { mapping: FieldMapping }) {
       <img
         src={metadata.sourceUrl}
         alt=""
-        className="max-h-40 rounded-md border border-neutral-800 object-contain"
+        className="max-h-40 rounded-lg border border-neutral-800/70 object-contain"
       />
     );
   }

@@ -142,7 +142,7 @@ export default async function PagesPage({
         description="Every URL the sync has ever discovered on the official site, and whether its recorded content hash is still consistent."
       />
 
-      <div className="rounded-lg border border-neutral-800 bg-neutral-900 p-4">
+      <div className="rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20 bg-neutral-900 p-4">
         <div className="flex flex-wrap items-center gap-2 text-sm">
           <FilterPill
             label={`All (${total})`}
@@ -183,7 +183,7 @@ export default async function PagesPage({
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-neutral-800">
+      <div className="overflow-x-auto rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20">
         <table className="w-full text-left text-sm">
           <thead className="bg-neutral-900 text-xs uppercase tracking-wide text-neutral-500">
             <tr>

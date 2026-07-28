@@ -21,19 +21,19 @@ export default async function TemplateDetailPage({
 
   return (
     <div className="space-y-6">
-      <div>
+      <div className="border-b border-neutral-800 pb-6">
         <Link href="/templates" className="text-sm text-blue-400 hover:underline">
           ← All templates
         </Link>
-        <h1 className="mt-2 text-xl font-semibold text-neutral-100">
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-neutral-100">
           {template.target_collection} / {template.target_slug}
         </h1>
-        <p className="text-sm text-neutral-500">
+        <p className="mt-1.5 text-sm text-neutral-500">
           Last updated {formatDateTime(template.updated_at)}
         </p>
       </div>
 
-      <section className="rounded-lg border border-neutral-800 bg-neutral-900 p-6">
+      <section className="rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20 bg-neutral-900 p-6">
         <h2 className="mb-4 text-sm font-medium text-neutral-300">
           Block sequence ({template.block_sequence?.length ?? 0} blocks)
         </h2>

@@ -44,7 +44,7 @@ export default async function ReviewPage() {
       />
 
       {groups.size === 0 && (
-        <p className="rounded-lg border border-neutral-800 bg-neutral-900 px-4 py-6 text-center text-sm text-neutral-500">
+        <p className="rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20 bg-neutral-900 px-4 py-6 text-center text-sm text-neutral-500">
           Nothing pending review. 🎉
         </p>
       )}
@@ -77,7 +77,7 @@ export default async function ReviewPage() {
               {superseded.map((change) => (
                 <section
                   key={change.id}
-                  className="rounded-lg border border-neutral-800 bg-neutral-900/40 p-4 opacity-60"
+                  className="rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20 bg-neutral-900/40 p-4 opacity-60"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <p className="text-xs text-neutral-500">

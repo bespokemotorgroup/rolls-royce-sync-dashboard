@@ -63,12 +63,12 @@ export default async function SectionMappingPage({
         <PageSelector options={options} selectedId={selectedPage?.id} />
 
         {!selectedPage ? (
-          <div className="flex items-center justify-center rounded-lg border border-neutral-800 bg-neutral-900 p-12 text-sm text-neutral-500">
+          <div className="flex items-center justify-center rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20 bg-neutral-900 p-12 text-sm text-neutral-500">
             Select a page to view its mappings.
           </div>
         ) : (
           <div className="space-y-6">
-            <section className="rounded-lg border border-neutral-800 bg-neutral-900 p-4">
+            <section className="rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20 bg-neutral-900 p-4">
               <a
                 href={selectedPage.source_url}
                 target="_blank"
@@ -84,13 +84,13 @@ export default async function SectionMappingPage({
             </section>
 
             {mappings.length === 0 && (
-              <p className="rounded-lg border border-neutral-800 bg-neutral-900 px-4 py-6 text-center text-sm text-neutral-500">
+              <p className="rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20 bg-neutral-900 px-4 py-6 text-center text-sm text-neutral-500">
                 No field mappings recorded for this page yet.
               </p>
             )}
 
             {Array.from(groups.entries()).map(([kind, group]) => (
-              <section key={kind} className="rounded-lg border border-neutral-800 bg-neutral-900">
+              <section key={kind} className="rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20 bg-neutral-900">
                 <h2 className="border-b border-neutral-800 px-4 py-3 text-sm font-medium capitalize text-neutral-300">
                   {kind} ({group.length})
                 </h2>
@@ -131,7 +131,7 @@ export default async function SectionMappingPage({
               </section>
             ))}
 
-            <section className="rounded-lg border border-neutral-800 bg-neutral-900 p-4">
+            <section className="rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20 bg-neutral-900 p-4">
               <h2 className="mb-3 text-sm font-medium text-neutral-300">
                 Template — {selectedPage.target_collection}
               </h2>
@@ -150,7 +150,7 @@ export default async function SectionMappingPage({
                     {(template.block_sequence ?? []).map((block) => (
                       <div
                         key={block.index}
-                        className="rounded-md border border-neutral-800 bg-neutral-950 p-3"
+                        className="rounded-lg border border-neutral-800/70 bg-neutral-950 p-3"
                       >
                         <div className="mb-2 flex items-center gap-2">
                           <span className="rounded bg-neutral-800 px-1.5 py-0.5 text-[10px] font-medium text-neutral-400">

@@ -24,16 +24,16 @@ export default async function RunDetailPage({
 
   return (
     <div className="space-y-6">
-      <div>
+      <div className="border-b border-neutral-800 pb-6">
         <Link href="/runs" className="text-sm text-blue-400 hover:underline">
           ← All runs
         </Link>
-        <h1 className="mt-2 text-xl font-semibold text-neutral-100">
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-neutral-100">
           Run #{run.id}
         </h1>
       </div>
 
-      <section className="rounded-lg border border-neutral-800 bg-neutral-900 p-6">
+      <section className="rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20 bg-neutral-900 p-6">
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <Field label="Status" value={<StatusBadge status={run.status} />} />
           <Field label="Mode" value={run.mode} />
@@ -45,7 +45,7 @@ export default async function RunDetailPage({
       </section>
 
       {run.summary && (
-        <section className="rounded-lg border border-neutral-800 bg-neutral-900 p-6">
+        <section className="rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20 bg-neutral-900 p-6">
           <h2 className="mb-4 text-sm font-medium text-neutral-300">Summary</h2>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-8">
             {Object.entries(run.summary)
@@ -65,7 +65,7 @@ export default async function RunDetailPage({
       )}
 
       {Array.isArray(errors) && errors.length > 0 && (
-        <section className="rounded-lg border border-neutral-800 bg-neutral-900 p-6">
+        <section className="rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20 bg-neutral-900 p-6">
           <h2 className="mb-4 text-sm font-medium text-neutral-300">
             Errors ({errors.length})
           </h2>

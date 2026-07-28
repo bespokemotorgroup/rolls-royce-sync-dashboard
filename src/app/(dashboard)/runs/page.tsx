@@ -20,7 +20,7 @@ export default async function RunsPage() {
     <div className="space-y-6">
       <PageHeader title="Sync runs" description="Most recent 100 runs, newest first." />
 
-      <div className="overflow-x-auto rounded-lg border border-neutral-800">
+      <div className="overflow-x-auto rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20">
         <table className="w-full text-left text-sm">
           <thead className="bg-neutral-900 text-xs uppercase tracking-wide text-neutral-500">
             <tr>

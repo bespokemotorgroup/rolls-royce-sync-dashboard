@@ -7,8 +7,16 @@ export default async function LoginPage({
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-neutral-950 px-4">
-      <div className="w-full max-w-sm rounded-lg border border-neutral-800 bg-neutral-900 p-8 shadow-xl">
-        <h1 className="mb-1 text-lg font-semibold text-neutral-100">Sync Dashboard</h1>
+      <div className="w-full max-w-sm rounded-xl border border-neutral-800/80 bg-neutral-900 p-8 shadow-xl shadow-black/40">
+        <div className="mb-6 flex items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-neutral-100 text-sm font-bold text-neutral-900">
+            RR
+          </div>
+          <div>
+            <h1 className="text-lg font-semibold leading-tight text-neutral-100">Content Sync</h1>
+            <p className="text-xs leading-tight text-neutral-500">Admin dashboard</p>
+          </div>
+        </div>
         <p className="mb-6 text-sm text-neutral-400">
           Enter the shared password to continue.
         </p>

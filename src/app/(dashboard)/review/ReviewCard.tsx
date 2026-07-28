@@ -47,7 +47,7 @@ export function ReviewCard({ change }: { change: ChangeEventRow }) {
   }
 
   return (
-    <section className="rounded-lg border border-neutral-800 bg-neutral-900 p-4">
+    <section className="rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20 bg-neutral-900 p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs text-neutral-500">{formatDateTime(change.created_at)}</p>
         <div className="flex items-center gap-2">
@@ -111,7 +111,7 @@ function FieldRow({
   onChange: (value: unknown) => void;
 }) {
   return (
-    <div className="rounded-md border border-neutral-800 bg-neutral-950 p-3">
+    <div className="rounded-lg border border-neutral-800/70 bg-neutral-950 p-3">
       <div className="mb-2 flex items-center gap-2">
         <span className="rounded bg-neutral-800 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-neutral-400">
           {field.kind}
@@ -225,7 +225,7 @@ function AssetEditor({ field, editing, onChange }: { field: DiffField; editing: 
           <img
             src={prev.url}
             alt={prev.alt ?? ""}
-            className="max-h-40 rounded-md border border-neutral-800 object-contain opacity-70"
+            className="max-h-40 rounded-lg border border-neutral-800/70 object-contain opacity-70"
           />
         ) : (
           <p className="text-neutral-600">—</p>
@@ -238,7 +238,7 @@ function AssetEditor({ field, editing, onChange }: { field: DiffField; editing: 
           <img
             src={curr.url}
             alt={curr.alt ?? ""}
-            className="max-h-40 rounded-md border border-neutral-800 object-contain"
+            className="max-h-40 rounded-lg border border-neutral-800/70 object-contain"
           />
         ) : (
           <p className="text-neutral-600">—</p>

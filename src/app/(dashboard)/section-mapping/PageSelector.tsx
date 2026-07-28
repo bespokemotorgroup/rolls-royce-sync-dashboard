@@ -24,7 +24,7 @@ export function PageSelector({ options, selectedId }: { options: Option[]; selec
   }, [options, query]);
 
   return (
-    <div className="rounded-lg border border-neutral-800 bg-neutral-900">
+    <div className="rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20 bg-neutral-900">
       <div className="border-b border-neutral-800 p-3">
         <input
           type="text"

@@ -37,7 +37,7 @@ export default async function ChangesPage() {
           return (
             <section
               key={change.id}
-              className="rounded-lg border border-neutral-800 bg-neutral-900 p-4"
+              className="rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20 bg-neutral-900 p-4"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
@@ -64,7 +64,7 @@ export default async function ChangesPage() {
               </div>
 
               {fields.length > 0 && (
-                <div className="mt-3 overflow-x-auto rounded-md border border-neutral-800">
+                <div className="mt-3 overflow-x-auto rounded-lg border border-neutral-800/70">
                   <table className="w-full text-left text-xs">
                     <thead className="bg-neutral-950 text-neutral-500">
                       <tr>
