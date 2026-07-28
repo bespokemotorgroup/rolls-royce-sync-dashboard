@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { query } from "@/lib/db";
 import type { ChangeEvent } from "@/lib/types";
 import { formatDateTime } from "@/lib/format";
@@ -7,25 +8,49 @@ import { PageHeader } from "@/components/PageHeader";
 
 export const dynamic = "force-dynamic";
 
-async function getHistory() {
+async function getHistory(sourcePageId?: string) {
+  const conditions = [
+    `ce.status IN ('published', 'rejected', 'superseded', 'requires_mapping', 'draft_updated')`,
+  ];
+  const values: unknown[] = [];
+  if (sourcePageId) {
+    values.push(sourcePageId);
+    conditions.push(`ce.source_page_id = $${values.length}`);
+  }
   return query<ChangeEvent>(
     `SELECT ce.*, sp.source_url, sp.target_slug, sp.target_collection
      FROM change_events ce
      JOIN source_pages sp ON sp.id = ce.source_page_id
-     WHERE ce.status IN ('published', 'rejected', 'superseded', 'requires_mapping', 'draft_updated')
+     WHERE ${conditions.join(" AND ")}
      ORDER BY ce.updated_at DESC
      LIMIT 200`,
+    values,
   );
 }
 
-export default async function HistoryPage() {
-  const changes = await getHistory();
+export default async function HistoryPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ source_page_id?: string }>;
+}) {
+  const { source_page_id } = await searchParams;
+  const changes = await getHistory(source_page_id);
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="History"
         description="What actually happened to reviewed changes — published, rejected, superseded, or blocked. Most recent 200, newest first."
+        action={
+          source_page_id && (
+            <Link
+              href="/history"
+              className="text-sm text-blue-400 hover:underline"
+            >
+              Clear filter (showing one page only) ×
+            </Link>
+          )
+        }
       />
 
       {changes.length === 0 && (

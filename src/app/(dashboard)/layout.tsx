@@ -43,6 +43,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
         { href: "/templates", label: "Templates" },
       ],
     },
+    {
+      label: "Inspect",
+      items: [
+        { href: "/pages", label: "All Pages" },
+        { href: "/section-mapping", label: "Section Mapping" },
+      ],
+    },
   ];
 
   return (

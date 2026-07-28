@@ -43,7 +43,7 @@ export interface FieldMapping {
   id: string;
   source_page_id: string;
   source_key: string;
-  mapping_kind: "text" | "asset" | "link";
+  mapping_kind: "text" | "asset" | "link" | "background";
   payload_pointer: string;
   status: "pending" | "approved" | "rejected";
   confidence: string;
@@ -53,6 +53,8 @@ export interface FieldMapping {
     currentPayloadMediaId?: string;
     label?: string;
     sourceHref?: string;
+    sourceColor?: string;
+    currentValue?: string;
     [key: string]: unknown;
   } | null;
   created_at: string;
@@ -61,6 +63,18 @@ export interface FieldMapping {
   source_url?: string;
   target_slug?: string | null;
   target_collection?: string;
+}
+
+export interface PageSnapshot {
+  id: string;
+  source_page_id: string;
+  sync_run_id: string;
+  page_hash: string;
+  canonical: unknown;
+  created_at: string;
+  // joined
+  trigger?: string;
+  mode?: string;
 }
 
 export interface DiffAssetValue {

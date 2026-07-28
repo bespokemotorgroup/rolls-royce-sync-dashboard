@@ -12,6 +12,15 @@ const STATUS_STYLES: Record<string, { pill: string; dot: string }> = {
   superseded: { pill: "bg-neutral-500/10 text-neutral-400 border-neutral-500/20", dot: "bg-neutral-500" },
   failed: { pill: "bg-red-500/10 text-red-400 border-red-500/20", dot: "bg-red-400" },
   rejected: { pill: "bg-red-500/10 text-red-400 border-red-500/20", dot: "bg-red-400" },
+  // source_pages.sync_status values
+  unchanged: { pill: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20", dot: "bg-emerald-400" },
+  mapped: { pill: "bg-blue-500/10 text-blue-400 border-blue-500/20", dot: "bg-blue-400" },
+  discovered: { pill: "bg-blue-500/10 text-blue-400 border-blue-500/20", dot: "bg-blue-400" },
+  new_source_page: { pill: "bg-blue-500/10 text-blue-400 border-blue-500/20", dot: "bg-blue-400" },
+  draft_created: { pill: "bg-amber-500/10 text-amber-400 border-amber-500/20", dot: "bg-amber-400" },
+  draft_created_from_template: { pill: "bg-amber-500/10 text-amber-400 border-amber-500/20", dot: "bg-amber-400" },
+  known_missing: { pill: "bg-orange-500/10 text-orange-400 border-orange-500/20", dot: "bg-orange-400" },
+  excluded_information_page: { pill: "bg-neutral-500/10 text-neutral-400 border-neutral-500/20", dot: "bg-neutral-500" },
 };
 
 const DEFAULT_STYLE = { pill: "bg-neutral-500/10 text-neutral-400 border-neutral-500/20", dot: "bg-neutral-500" };
