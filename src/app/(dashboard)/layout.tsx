@@ -3,8 +3,11 @@ import Link from "next/link";
 const NAV_ITEMS = [
   { href: "/", label: "Overview" },
   { href: "/runs", label: "Runs" },
+  { href: "/review", label: "Review Queue" },
+  { href: "/approved", label: "Approved" },
   { href: "/mappings", label: "Pending Mappings" },
   { href: "/changes", label: "Recent Changes" },
+  { href: "/history", label: "History" },
   { href: "/templates", label: "Templates" },
 ];
 

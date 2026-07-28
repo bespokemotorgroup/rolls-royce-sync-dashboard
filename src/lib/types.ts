@@ -63,29 +63,57 @@ export interface FieldMapping {
   target_collection?: string;
 }
 
+export interface DiffAssetValue {
+  key?: string;
+  url: string;
+  alt?: string;
+  fingerprint?: string;
+  variants?: Array<{
+    breakpoint: string;
+    minWidth: number;
+    url: string;
+    width: number;
+    fingerprint: string;
+  }>;
+}
+
+export interface DiffLinkValue {
+  text: string;
+  href: string;
+}
+
+export interface DiffField {
+  sourceKey: string;
+  kind: "text" | "asset" | "link" | "background";
+  previous?: unknown;
+  current?: unknown;
+}
+
+export interface ChangeDiff {
+  fields?: DiffField[];
+  sectionsAdded?: unknown[];
+  sectionsRemoved?: unknown[];
+}
+
 export interface ChangeEvent {
   id: string;
   source_page_id: string;
   sync_run_id: string;
   status:
-    | "detected"
-    | "reported"
+    | "pending_review"
+    | "approved"
     | "published"
     | "draft_updated"
     | "requires_mapping"
+    | "superseded"
+    | "rejected"
+    | "detected"
+    | "reported"
     | "failed";
   previous_hash: string | null;
   current_hash: string | null;
-  diff: {
-    fields?: Array<{
-      sourceKey: string;
-      kind: "text" | "asset" | "link";
-      previous?: unknown;
-      current?: unknown;
-    }>;
-    sectionsAdded?: unknown[];
-    sectionsRemoved?: unknown[];
-  } | null;
+  diff: ChangeDiff | null;
+  review_diff: ChangeDiff | null;
   payload_result: {
     status?: string;
     blocked?: unknown[];
@@ -97,6 +125,7 @@ export interface ChangeEvent {
   // joined
   source_url?: string;
   target_slug?: string | null;
+  target_collection?: string;
 }
 
 export interface PageTemplate {

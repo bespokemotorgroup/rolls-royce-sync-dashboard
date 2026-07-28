@@ -21,6 +21,13 @@ async function getPendingCounts() {
   );
 }
 
+async function getPendingReviewCount() {
+  const row = await queryOne<{ count: string }>(
+    `SELECT COUNT(*)::text AS count FROM change_events WHERE status = 'pending_review'`,
+  );
+  return Number(row?.count ?? 0);
+}
+
 async function getRecentFailures() {
   return query<{ id: string; started_at: string; status: string; mode: string; error: string | null }>(
     `SELECT id, started_at, status, mode, error
@@ -32,9 +39,10 @@ async function getRecentFailures() {
 }
 
 export default async function OverviewPage() {
-  const [latestRun, pendingCounts, recentFailures] = await Promise.all([
+  const [latestRun, pendingCounts, pendingReviewCount, recentFailures] = await Promise.all([
     getLatestRun(),
     getPendingCounts(),
+    getPendingReviewCount(),
     getRecentFailures(),
   ]);
 
@@ -76,6 +84,25 @@ export default async function OverviewPage() {
       </section>
 
       <div className="grid gap-6 md:grid-cols-2">
+        <section className="rounded-lg border border-neutral-800 bg-neutral-900 p-6">
+          <h2 className="mb-4 text-sm font-medium text-neutral-300">
+            Changes awaiting review ({pendingReviewCount})
+          </h2>
+          {pendingReviewCount > 0 ? (
+            <p className="text-sm text-neutral-400">
+              {pendingReviewCount} content change{pendingReviewCount === 1 ? "" : "s"} detected on the
+              official site {pendingReviewCount === 1 ? "is" : "are"} waiting for approval.
+            </p>
+          ) : (
+            <p className="text-sm text-neutral-500">Nothing pending review.</p>
+          )}
+          <div className="mt-4">
+            <Link href="/review" className="text-sm text-blue-400 hover:underline">
+              Review queue →
+            </Link>
+          </div>
+        </section>
+
         <section className="rounded-lg border border-neutral-800 bg-neutral-900 p-6">
           <h2 className="mb-4 text-sm font-medium text-neutral-300">
             Pending mappings ({totalPending})
