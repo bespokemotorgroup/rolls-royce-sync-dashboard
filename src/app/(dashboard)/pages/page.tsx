@@ -184,7 +184,17 @@ export default async function PagesPage({
       </div>
 
       <div className="overflow-x-auto rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20">
-        <table className="w-full text-left text-sm">
+        <table className="w-full min-w-[1180px] table-fixed text-left text-sm">
+          <colgroup>
+            <col className="w-10" />
+            <col className="w-[26%]" />
+            <col className="w-[14%]" />
+            <col className="w-[11%]" />
+            <col className="w-[16%]" />
+            <col className="w-[11%]" />
+            <col className="w-[11%]" />
+            <col className="w-[11%]" />
+          </colgroup>
           <thead className="bg-neutral-900 text-xs uppercase tracking-wide text-neutral-500">
             <tr>
               <th className="px-4 py-3 font-medium" />
@@ -193,7 +203,7 @@ export default async function PagesPage({
               </th>
               <th className="px-4 py-3 font-medium">Target slug</th>
               <th className="px-4 py-3 font-medium">Sync status</th>
-              <th className="px-4 py-3 font-medium">Current hash</th>
+              <th className="px-4 py-3 font-medium">Current vs. last synced hash</th>
               <th className="px-4 py-3 font-medium">
                 <SortLink label="Last checked" col="last_checked_at" href={sortHref("last_checked_at")} active={params.sort === "last_checked_at" || !params.sort} dir={params.dir} />
               </th>

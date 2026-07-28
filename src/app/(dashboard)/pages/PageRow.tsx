@@ -17,47 +17,67 @@ export function PageRow({
   mismatched: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  const latestSnapshotHash = snapshots[0]?.page_hash ?? null;
 
   return (
     <>
       <tr
-        className="cursor-pointer hover:bg-neutral-900/60"
+        className="cursor-pointer align-top hover:bg-neutral-900/60"
         onClick={() => setOpen((v) => !v)}
       >
-        <td className="px-4 py-3 text-neutral-500">
+        <td className="w-10 px-4 py-3 text-neutral-500">
           <span className={`inline-block transition-transform ${open ? "rotate-90" : ""}`}>▸</span>
         </td>
-        <td className="max-w-xs px-4 py-3">
+        <td className="min-w-0 px-4 py-3">
           <a
             href={page.source_url}
             target="_blank"
             rel="noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="truncate text-blue-400 hover:underline"
+            className="block truncate text-blue-400 hover:underline"
+            title={page.source_url}
           >
             {page.source_url}
           </a>
         </td>
-        <td className="px-4 py-3 text-neutral-300">{page.target_slug ?? "—"}</td>
+        <td className="min-w-0 px-4 py-3 text-neutral-300">
+          <span className="block truncate" title={page.target_slug ?? undefined}>
+            {page.target_slug ?? "—"}
+          </span>
+        </td>
         <td className="px-4 py-3">
           <StatusBadge status={page.sync_status} />
         </td>
         <td className="px-4 py-3">
-          <span onClick={(e) => e.stopPropagation()} className="inline-flex items-center gap-1.5">
-            <HashChip value={page.current_hash} />
+          <span onClick={(e) => e.stopPropagation()} className="flex flex-col gap-1">
+            <span className="flex items-center gap-1.5">
+              <span className="w-16 shrink-0 text-[10px] uppercase tracking-wide text-neutral-600">
+                current
+              </span>
+              <HashChip value={page.current_hash} tone={mismatched ? "warn" : undefined} />
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-16 shrink-0 text-[10px] uppercase tracking-wide text-neutral-600">
+                last synced
+              </span>
+              <HashChip value={latestSnapshotHash} tone={mismatched ? "warn" : undefined} />
+            </span>
             {mismatched && (
-              <span
-                title="current_hash does not match the most recent page_snapshots row — inconsistent, worth reporting"
-                className="text-amber-400"
-              >
-                ⚠
+              <span className="flex items-center gap-1 text-[11px] text-amber-400">
+                ⚠ hashes don&apos;t match
               </span>
             )}
           </span>
         </td>
-        <td className="px-4 py-3 text-neutral-400">{formatDateTime(page.last_checked_at)}</td>
-        <td className="px-4 py-3 text-neutral-400">{formatDateTime(page.last_changed_at)}</td>
-        <td className="px-4 py-3 text-neutral-400">{formatDateTime(page.last_synced_at)}</td>
+        <td className="whitespace-nowrap px-4 py-3 text-neutral-400">
+          {formatDateTime(page.last_checked_at)}
+        </td>
+        <td className="whitespace-nowrap px-4 py-3 text-neutral-400">
+          {formatDateTime(page.last_changed_at)}
+        </td>
+        <td className="whitespace-nowrap px-4 py-3 text-neutral-400">
+          {formatDateTime(page.last_synced_at)}
+        </td>
       </tr>
       {open && (
         <tr className="bg-neutral-950/60">
@@ -118,10 +138,13 @@ export function PageRow({
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-neutral-800">
-                        {snapshots.map((snap) => (
+                        {snapshots.map((snap, i) => (
                           <tr key={snap.id}>
                             <td className="px-3 py-2">
-                              <HashChip value={snap.page_hash} />
+                              <HashChip
+                                value={snap.page_hash}
+                                tone={i === 0 && mismatched ? "warn" : undefined}
+                              />
                             </td>
                             <td className="px-3 py-2 text-neutral-400">
                               {formatDateTime(snap.created_at)}
