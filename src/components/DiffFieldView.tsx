@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import type { DiffAssetValue, DiffField, DiffLinkValue } from "@/lib/types";
 
 export function DiffFieldView({ field }: { field: DiffField }) {
@@ -108,6 +111,8 @@ function AssetSide({
   asset: DiffAssetValue | undefined;
   dim?: boolean;
 }) {
+  const [failed, setFailed] = useState(false);
+
   if (!asset?.url) {
     return (
       <div>
@@ -120,15 +125,32 @@ function AssetSide({
   return (
     <div>
       <p className="mb-1 text-[10px] uppercase text-neutral-600">{label}</p>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={asset.url}
-        alt={asset.alt ?? ""}
-        className={`max-h-40 rounded-lg border border-neutral-800/70 object-contain ${dim ? "opacity-70" : ""}`}
-      />
-      <p className="mt-1 truncate text-[11px] text-neutral-600" title={asset.url}>
+      <div
+        className={`flex h-40 items-center justify-center overflow-hidden rounded-lg border border-neutral-800/70 bg-neutral-900 ${dim ? "opacity-70" : ""}`}
+      >
+        {failed ? (
+          <span className="px-3 text-center text-[11px] text-red-400/80">
+            ⚠ Image failed to load
+          </span>
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={asset.url}
+            alt={asset.alt ?? ""}
+            onError={() => setFailed(true)}
+            className="max-h-40 max-w-full object-contain"
+          />
+        )}
+      </div>
+      <a
+        href={asset.url}
+        target="_blank"
+        rel="noreferrer"
+        className="mt-1 block truncate text-[11px] text-neutral-500 hover:text-blue-400 hover:underline"
+        title={asset.url}
+      >
         {asset.url}
-      </p>
+      </a>
       {asset.fingerprint && (
         <p className="truncate font-mono text-[10px] text-neutral-700" title={asset.fingerprint}>
           fp: {asset.fingerprint.slice(0, 20)}…

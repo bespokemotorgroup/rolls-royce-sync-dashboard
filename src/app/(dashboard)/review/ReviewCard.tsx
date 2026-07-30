@@ -223,43 +223,15 @@ function AssetEditor({ field, editing, onChange }: { field: DiffField; editing: 
     <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
       <div>
         <p className="mb-1 text-[10px] uppercase text-neutral-600">Previous</p>
-        {prev?.url ? (
-          <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={prev.url}
-              alt={prev.alt ?? ""}
-              className="max-h-40 rounded-lg border border-neutral-800/70 object-contain opacity-70"
-            />
-            <p className="mt-1 truncate text-[11px] text-neutral-600" title={prev.url}>
-              {prev.url}
-            </p>
-          </>
-        ) : (
-          <p className="text-neutral-600">—</p>
-        )}
+        <AssetImage url={prev?.url} alt={prev?.alt} dim />
       </div>
       <div className="space-y-2">
         <p className="mb-1 text-[10px] uppercase text-neutral-600">Current</p>
-        {curr.url ? (
-          <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={curr.url}
-              alt={curr.alt ?? ""}
-              className="max-h-40 rounded-lg border border-neutral-800/70 object-contain"
-            />
-            <p className="truncate text-[11px] text-neutral-600" title={curr.url}>
-              {curr.url}
-            </p>
-            {sameFingerprint && (
-              <p className="text-[11px] text-neutral-500">
-                Fingerprint matches previous — same image content.
-              </p>
-            )}
-          </>
-        ) : (
-          <p className="text-neutral-600">—</p>
+        <AssetImage url={curr.url} alt={curr.alt} />
+        {sameFingerprint && (
+          <p className="text-[11px] text-neutral-500">
+            Fingerprint matches previous — same image content.
+          </p>
         )}
         {editing && (
           <div className="space-y-1">
@@ -280,6 +252,41 @@ function AssetEditor({ field, editing, onChange }: { field: DiffField; editing: 
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function AssetImage({ url, alt, dim }: { url: string | undefined; alt?: string; dim?: boolean }) {
+  const [failed, setFailed] = useState(false);
+
+  if (!url) return <p className="text-neutral-600">—</p>;
+
+  return (
+    <div>
+      <div
+        className={`flex h-40 items-center justify-center overflow-hidden rounded-lg border border-neutral-800/70 bg-neutral-950 ${dim ? "opacity-70" : ""}`}
+      >
+        {failed ? (
+          <span className="px-3 text-center text-[11px] text-red-400/80">⚠ Image failed to load</span>
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={url}
+            alt={alt ?? ""}
+            onError={() => setFailed(true)}
+            className="max-h-40 max-w-full object-contain"
+          />
+        )}
+      </div>
+      <a
+        href={url}
+        target="_blank"
+        rel="noreferrer"
+        className="mt-1 block truncate text-[11px] text-neutral-500 hover:text-blue-400 hover:underline"
+        title={url}
+      >
+        {url}
+      </a>
     </div>
   );
 }
