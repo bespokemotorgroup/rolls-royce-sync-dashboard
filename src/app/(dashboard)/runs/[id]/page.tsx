@@ -24,13 +24,21 @@ export default async function RunDetailPage({
 
   return (
     <div className="space-y-6">
-      <div className="border-b border-neutral-800 pb-6">
-        <Link href="/runs" className="text-sm text-blue-400 hover:underline">
-          ← All runs
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-neutral-800 pb-6">
+        <div>
+          <Link href="/runs" className="text-sm text-blue-400 hover:underline">
+            ← All runs
+          </Link>
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-neutral-100">
+            Run #{run.id}
+          </h1>
+        </div>
+        <Link
+          href={`/changes?sync_run_id=${run.id}`}
+          className="rounded-md bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-200 transition hover:bg-neutral-700"
+        >
+          View changes from this run →
         </Link>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-neutral-100">
-          Run #{run.id}
-        </h1>
       </div>
 
       <section className="rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20 bg-neutral-900 p-6">
