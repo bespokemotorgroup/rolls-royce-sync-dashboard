@@ -216,17 +216,25 @@ function AssetEditor({ field, editing, onChange }: { field: DiffField; editing: 
     onChange({ ...curr, ...patch });
   }
 
+  const sameFingerprint =
+    !!prev?.fingerprint && !!curr.fingerprint && prev.fingerprint === curr.fingerprint;
+
   return (
     <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
       <div>
         <p className="mb-1 text-[10px] uppercase text-neutral-600">Previous</p>
         {prev?.url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={prev.url}
-            alt={prev.alt ?? ""}
-            className="max-h-40 rounded-lg border border-neutral-800/70 object-contain opacity-70"
-          />
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={prev.url}
+              alt={prev.alt ?? ""}
+              className="max-h-40 rounded-lg border border-neutral-800/70 object-contain opacity-70"
+            />
+            <p className="mt-1 truncate text-[11px] text-neutral-600" title={prev.url}>
+              {prev.url}
+            </p>
+          </>
         ) : (
           <p className="text-neutral-600">—</p>
         )}
@@ -234,12 +242,22 @@ function AssetEditor({ field, editing, onChange }: { field: DiffField; editing: 
       <div className="space-y-2">
         <p className="mb-1 text-[10px] uppercase text-neutral-600">Current</p>
         {curr.url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={curr.url}
-            alt={curr.alt ?? ""}
-            className="max-h-40 rounded-lg border border-neutral-800/70 object-contain"
-          />
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={curr.url}
+              alt={curr.alt ?? ""}
+              className="max-h-40 rounded-lg border border-neutral-800/70 object-contain"
+            />
+            <p className="truncate text-[11px] text-neutral-600" title={curr.url}>
+              {curr.url}
+            </p>
+            {sameFingerprint && (
+              <p className="text-[11px] text-neutral-500">
+                Fingerprint matches previous — same image content.
+              </p>
+            )}
+          </>
         ) : (
           <p className="text-neutral-600">—</p>
         )}

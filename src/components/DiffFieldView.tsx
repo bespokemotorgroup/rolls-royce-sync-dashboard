@@ -71,34 +71,69 @@ function Swatch({ label, color }: { label: string; color: string | undefined }) 
 function AssetValue({ previous, current }: { previous: unknown; current: unknown }) {
   const prev = previous as DiffAssetValue | undefined;
   const curr = current as DiffAssetValue | undefined;
+
+  const sameUrl = !!prev?.url && !!curr?.url && prev.url === curr.url;
+  const sameFingerprint =
+    !!prev?.fingerprint && !!curr?.fingerprint && prev.fingerprint === curr.fingerprint;
+
+  let note: string | null = null;
+  if (prev?.url && curr?.url) {
+    if (sameFingerprint) {
+      note =
+        "Same image content (fingerprint matches) — only the URL/CDN path changed, or nothing visually changed at all.";
+    } else if (sameUrl) {
+      note = "Same URL, but the file behind it was replaced — fingerprint differs.";
+    } else if (prev.fingerprint && curr.fingerprint) {
+      note = "Different image content (fingerprint differs).";
+    }
+  }
+
   return (
-    <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
-      <div>
-        <p className="mb-1 text-[10px] uppercase text-neutral-600">Previous</p>
-        {prev?.url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={prev.url}
-            alt={prev.alt ?? ""}
-            className="max-h-40 rounded-lg border border-neutral-800/70 object-contain opacity-70"
-          />
-        ) : (
-          <p className="text-neutral-600">—</p>
-        )}
+    <div>
+      <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+        <AssetSide label="Previous" asset={prev} dim />
+        <AssetSide label="Current" asset={curr} />
       </div>
+      {note && <p className="mt-2 text-[11px] text-neutral-500">{note}</p>}
+    </div>
+  );
+}
+
+function AssetSide({
+  label,
+  asset,
+  dim,
+}: {
+  label: string;
+  asset: DiffAssetValue | undefined;
+  dim?: boolean;
+}) {
+  if (!asset?.url) {
+    return (
       <div>
-        <p className="mb-1 text-[10px] uppercase text-neutral-600">Current</p>
-        {curr?.url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={curr.url}
-            alt={curr.alt ?? ""}
-            className="max-h-40 rounded-lg border border-neutral-800/70 object-contain"
-          />
-        ) : (
-          <p className="text-neutral-600">—</p>
-        )}
+        <p className="mb-1 text-[10px] uppercase text-neutral-600">{label}</p>
+        <p className="text-neutral-600">—</p>
       </div>
+    );
+  }
+
+  return (
+    <div>
+      <p className="mb-1 text-[10px] uppercase text-neutral-600">{label}</p>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={asset.url}
+        alt={asset.alt ?? ""}
+        className={`max-h-40 rounded-lg border border-neutral-800/70 object-contain ${dim ? "opacity-70" : ""}`}
+      />
+      <p className="mt-1 truncate text-[11px] text-neutral-600" title={asset.url}>
+        {asset.url}
+      </p>
+      {asset.fingerprint && (
+        <p className="truncate font-mono text-[10px] text-neutral-700" title={asset.fingerprint}>
+          fp: {asset.fingerprint.slice(0, 20)}…
+        </p>
+      )}
     </div>
   );
 }
