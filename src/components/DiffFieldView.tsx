@@ -40,7 +40,7 @@ function TextValue({ previous, current }: { previous: unknown; current: unknown 
         </p>
       </div>
       <div>
-        <p className="mb-1 text-[10px] uppercase text-n eutral-600">Current</p>
+        <p className="mb-1 text-[10px] uppercase text-neutral-600">Current</p>
         <p className="whitespace-pre-wrap text-neutral-200">{stringify(current)}</p>
       </div>
     </div>
