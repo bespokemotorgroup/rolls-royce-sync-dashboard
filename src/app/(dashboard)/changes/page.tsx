@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { query } from "@/lib/db";
-import type { ChangeEvent } from "@/lib/types";
+import type { ChangeEvent, DiffField } from "@/lib/types";
 import { formatDateTime } from "@/lib/format";
 import { StatusBadge } from "@/components/StatusBadge";
 import { PageHeader } from "@/components/PageHeader";
 import { DiffFieldView } from "@/components/DiffFieldView";
 
 export const dynamic = "force-dynamic";
+
+const KINDS: DiffField["kind"][] = ["text", "asset", "link", "background"];
 
 async function getChanges(syncRunId?: string) {
   const conditions: string[] = [];
@@ -30,10 +32,36 @@ async function getChanges(syncRunId?: string) {
 export default async function ChangesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ sync_run_id?: string }>;
+  searchParams: Promise<{ sync_run_id?: string; kind?: string }>;
 }) {
-  const { sync_run_id } = await searchParams;
+  const { sync_run_id, kind } = await searchParams;
   const changes = await getChanges(sync_run_id);
+
+  function kindHref(nextKind: string | undefined) {
+    const sp = new URLSearchParams();
+    if (sync_run_id) sp.set("sync_run_id", sync_run_id);
+    if (nextKind) sp.set("kind", nextKind);
+    const qs = sp.toString();
+    return `/changes${qs ? `?${qs}` : ""}`;
+  }
+
+  // Count fields by kind across the loaded set, for the filter pill counts.
+  const kindCounts: Record<string, number> = {};
+  for (const change of changes) {
+    const fields = change.review_diff?.fields ?? change.diff?.fields ?? [];
+    for (const field of fields) {
+      kindCounts[field.kind] = (kindCounts[field.kind] ?? 0) + 1;
+    }
+  }
+  const totalFields = Object.values(kindCounts).reduce((a, b) => a + b, 0);
+
+  const visibleChanges = changes
+    .map((change) => {
+      const fields = change.review_diff?.fields ?? change.diff?.fields ?? [];
+      const filteredFields = kind ? fields.filter((f) => f.kind === kind) : fields;
+      return { change, fields: filteredFields };
+    })
+    .filter(({ change, fields }) => !kind || fields.length > 0 || !!change.error);
 
   return (
     <div className="space-y-6">
@@ -50,24 +78,36 @@ export default async function ChangesPage({
               <Link href={`/runs/${sync_run_id}`} className="text-sm text-blue-400 hover:underline">
                 ← Back to run #{sync_run_id}
               </Link>
-              <Link href="/changes" className="text-sm text-blue-400 hover:underline">
-                Clear filter ×
+              <Link href={kindHref(kind)} className="text-sm text-blue-400 hover:underline">
+                Clear run filter ×
               </Link>
             </div>
           )
         }
       />
 
-      {changes.length === 0 && (
+      <div className="flex flex-wrap items-center gap-2 text-sm">
+        <span className="text-xs uppercase tracking-wide text-neutral-500">Content type</span>
+        <FilterPill label={`All (${totalFields})`} href={kindHref(undefined)} active={!kind} />
+        {KINDS.map((k) => (
+          <FilterPill
+            key={k}
+            label={`${k} (${kindCounts[k] ?? 0})`}
+            href={kindHref(k)}
+            active={kind === k}
+          />
+        ))}
+      </div>
+
+      {visibleChanges.length === 0 && (
         <p className="rounded-xl border border-neutral-800/80 bg-neutral-900 px-4 py-6 text-center text-sm text-neutral-500 shadow-sm shadow-black/20">
-          {sync_run_id ? "No changes recorded for this run." : "No changes recorded yet."}
+          {kind ? `No ${kind} changes match this filter.` : sync_run_id ? "No changes recorded for this run." : "No changes recorded yet."}
         </p>
       )}
 
       <div className="space-y-4">
-        {changes.map((change) => {
+        {visibleChanges.map(({ change, fields }) => {
           const blocked = change.payload_result?.blocked ?? [];
-          const fields = change.review_diff?.fields ?? change.diff?.fields ?? [];
           return (
             <section
               key={change.id}
@@ -86,7 +126,7 @@ export default async function ChangesPage({
                   <p className="text-xs text-neutral-500">
                     {change.target_slug ?? "unmapped"} · {formatDateTime(change.created_at)} ·{" "}
                     <Link
-                      href={`/changes?sync_run_id=${change.sync_run_id}`}
+                      href={`/changes?sync_run_id=${change.sync_run_id}${kind ? `&kind=${kind}` : ""}`}
                       className="text-blue-400 hover:underline"
                     >
                       run #{change.sync_run_id}
@@ -119,5 +159,20 @@ export default async function ChangesPage({
         })}
       </div>
     </div>
+  );
+}
+
+function FilterPill({ label, href, active }: { label: string; href: string; active: boolean }) {
+  return (
+    <Link
+      href={href}
+      className={`rounded-full border px-3 py-1 text-xs font-medium capitalize transition ${
+        active
+          ? "border-neutral-100 bg-neutral-100 text-neutral-900"
+          : "border-neutral-700 text-neutral-400 hover:border-neutral-500 hover:text-neutral-200"
+      }`}
+    >
+      {label}
+    </Link>
   );
 }
