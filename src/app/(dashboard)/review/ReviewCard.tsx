@@ -146,6 +146,7 @@ function FieldRow({
           <button
             type="button"
             disabled={disabled}
+            aria-pressed={decision === "approved"}
             onClick={() => onDecision("approved")}
             className={`rounded px-2 py-1 text-[11px] font-medium disabled:opacity-40 ${
               decision === "approved"
@@ -158,6 +159,7 @@ function FieldRow({
           <button
             type="button"
             disabled={disabled}
+            aria-pressed={decision === "rejected"}
             onClick={() => onDecision("rejected")}
             className={`rounded px-2 py-1 text-[11px] font-medium disabled:opacity-40 ${
               decision === "rejected" ? "bg-red-500 text-white" : "bg-red-500/10 text-red-400"

@@ -9,7 +9,7 @@ type Decision = "approved" | "rejected";
 type DecisionResult = { resolved: boolean; status: ReviewStatus };
 
 interface ReviewRow {
-  diff: ChangeDiff;
+  diff: ChangeDiff | null;
   review_diff: ChangeDiff | null;
 }
 
@@ -32,7 +32,7 @@ async function decideAllFields(id: string, decision: Decision): Promise<Decision
     const row = selected.rows[0];
     if (!row) return { resolved: true, status: "rejected" } as const;
 
-    const working = row.review_diff ?? row.diff;
+    const working = row.review_diff ?? row.diff ?? {};
     const fields = working.fields ?? [];
     const decisions = Object.fromEntries(fields.map((field) => [field.sourceKey, decision]));
     const approvedFields = decision === "approved" ? fields : [];
@@ -72,7 +72,7 @@ export async function saveReviewDiff(id: string, diff: ChangeDiff) {
     const row = selected.rows[0];
     if (!row) return;
 
-    const working = row.review_diff ?? row.diff;
+    const working = row.review_diff ?? row.diff ?? {};
     const reviewDiff: ChangeDiff = {
       ...working,
       fields: diff.fields ?? working.fields,
@@ -106,7 +106,7 @@ export async function decideChangeField(
     const row = selected.rows[0];
     if (!row) return { resolved: true, status: "rejected" } as const;
 
-    const working = row.review_diff ?? row.diff;
+    const working = row.review_diff ?? row.diff ?? {};
     const fields = working.fields ?? [];
     if (!fields.some((field) => field.sourceKey === sourceKey)) {
       throw new Error("Unknown review field");
