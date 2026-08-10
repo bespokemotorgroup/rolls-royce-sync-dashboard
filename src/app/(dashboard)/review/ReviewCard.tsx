@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import type { ChangeEvent as ChangeEventRow, DiffAssetValue, DiffField, DiffLinkValue } from "@/lib/types";
 import { formatDateTime } from "@/lib/format";
-import { approveChange, rejectChange, saveReviewDiff } from "./actions";
+import { approveChange, decideChangeField, rejectChange, saveReviewDiff } from "./actions";
 
 export function ReviewCard({ change }: { change: ChangeEventRow }) {
   const originalFields = change.review_diff?.fields ?? change.diff?.fields ?? [];
@@ -11,6 +11,9 @@ export function ReviewCard({ change }: { change: ChangeEventRow }) {
   const [editing, setEditing] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [resolved, setResolved] = useState(false);
+  const [decisions, setDecisions] = useState<Record<string, "approved" | "rejected">>(
+    change.review_diff?.decisions ?? {},
+  );
 
   if (resolved) return null;
 
@@ -26,6 +29,7 @@ export function ReviewCard({ change }: { change: ChangeEventRow }) {
           fields,
           sectionsAdded: change.diff?.sectionsAdded ?? [],
           sectionsRemoved: change.diff?.sectionsRemoved ?? [],
+          decisions,
         });
       }
       setEditing(false);
@@ -33,23 +37,35 @@ export function ReviewCard({ change }: { change: ChangeEventRow }) {
   }
 
   function approve() {
-    setResolved(true);
-    startTransition(() => {
-      void approveChange(change.id);
+    startTransition(async () => {
+      const result = await approveChange(change.id);
+      if (result.resolved) setResolved(true);
     });
   }
 
   function reject() {
-    setResolved(true);
-    startTransition(() => {
-      void rejectChange(change.id);
+    startTransition(async () => {
+      const result = await rejectChange(change.id);
+      if (result.resolved) setResolved(true);
     });
   }
+
+  function decideField(sourceKey: string, decision: "approved" | "rejected") {
+    setDecisions((previous) => ({ ...previous, [sourceKey]: decision }));
+    startTransition(async () => {
+      const result = await decideChangeField(change.id, sourceKey, decision);
+      if (result.resolved) setResolved(true);
+    });
+  }
+
+  const decidedCount = fields.filter((field) => decisions[field.sourceKey]).length;
 
   return (
     <section className="rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20 bg-neutral-900 p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs text-neutral-500">{formatDateTime(change.created_at)}</p>
+        <p className="text-xs text-neutral-500">
+          {formatDateTime(change.created_at)} · {decidedCount}/{fields.length} decided
+        </p>
         <div className="flex items-center gap-2">
           {!editing && (
             <button
@@ -74,14 +90,14 @@ export function ReviewCard({ change }: { change: ChangeEventRow }) {
             disabled={isPending || editing}
             className="rounded-md bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400 disabled:opacity-40"
           >
-            Approve
+            Approve all
           </button>
           <button
             onClick={reject}
             disabled={isPending || editing}
             className="rounded-md bg-red-500/10 px-3 py-1 text-xs font-medium text-red-400 disabled:opacity-40"
           >
-            Reject
+            Reject all
           </button>
         </div>
       </div>
@@ -92,6 +108,9 @@ export function ReviewCard({ change }: { change: ChangeEventRow }) {
             key={field.sourceKey + i}
             field={field}
             editing={editing}
+            decision={decisions[field.sourceKey]}
+            disabled={isPending || editing}
+            onDecision={(decision) => decideField(field.sourceKey, decision)}
             onChange={(value) => updateCurrent(i, value)}
           />
         ))}
@@ -104,19 +123,49 @@ export function ReviewCard({ change }: { change: ChangeEventRow }) {
 function FieldRow({
   field,
   editing,
+  decision,
+  disabled,
+  onDecision,
   onChange,
 }: {
   field: DiffField;
   editing: boolean;
+  decision?: "approved" | "rejected";
+  disabled: boolean;
+  onDecision: (decision: "approved" | "rejected") => void;
   onChange: (value: unknown) => void;
 }) {
   return (
     <div className="rounded-lg border border-neutral-800/70 bg-neutral-950 p-3">
-      <div className="mb-2 flex items-center gap-2">
+      <div className="mb-2 flex flex-wrap items-center gap-2">
         <span className="rounded bg-neutral-800 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-neutral-400">
           {field.kind}
         </span>
         <code className="truncate text-xs text-neutral-500">{field.sourceKey}</code>
+        <div className="ml-auto flex items-center gap-1.5">
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={() => onDecision("approved")}
+            className={`rounded px-2 py-1 text-[11px] font-medium disabled:opacity-40 ${
+              decision === "approved"
+                ? "bg-emerald-500 text-black"
+                : "bg-emerald-500/10 text-emerald-400"
+            }`}
+          >
+            Approve
+          </button>
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={() => onDecision("rejected")}
+            className={`rounded px-2 py-1 text-[11px] font-medium disabled:opacity-40 ${
+              decision === "rejected" ? "bg-red-500 text-white" : "bg-red-500/10 text-red-400"
+            }`}
+          >
+            Reject
+          </button>
+        </div>
       </div>
       <FieldEditor field={field} editing={editing} onChange={onChange} />
     </div>

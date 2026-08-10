@@ -1,8 +1,5 @@
 import { query } from "@/lib/db";
 import type { ChangeEvent } from "@/lib/types";
-import { formatDateTime } from "@/lib/format";
-import { StatusBadge } from "@/components/StatusBadge";
-import { DiffFieldView } from "@/components/DiffFieldView";
 import { ReviewCard } from "./ReviewCard";
 import { PageHeader } from "@/components/PageHeader";
 
@@ -13,7 +10,7 @@ async function getQueue() {
     `SELECT ce.*, sp.source_url, sp.target_slug, sp.target_collection
      FROM change_events ce
      JOIN source_pages sp ON sp.id = ce.source_page_id
-     WHERE ce.status IN ('pending_review', 'superseded')
+     WHERE ce.status = 'pending_review'
      ORDER BY sp.source_url, ce.created_at DESC`,
   );
 }
@@ -28,7 +25,7 @@ export default async function ReviewPage() {
     groups.set(row.source_page_id, list);
   }
 
-  const pendingCount = rows.filter((r) => r.status === "pending_review").length;
+  const pendingCount = rows.length;
 
   return (
     <div className="space-y-6">
@@ -51,8 +48,6 @@ export default async function ReviewPage() {
 
       <div className="space-y-8">
         {Array.from(groups.entries()).map(([sourcePageId, group]) => {
-          const pending = group.filter((r) => r.status === "pending_review");
-          const superseded = group.filter((r) => r.status === "superseded");
           const first = group[0];
           return (
             <div key={sourcePageId} className="space-y-3">
@@ -70,27 +65,8 @@ export default async function ReviewPage() {
                 </p>
               </div>
 
-              {pending.map((change) => (
+              {group.map((change) => (
                 <ReviewCard key={change.id} change={change} />
-              ))}
-
-              {superseded.map((change) => (
-                <section
-                  key={change.id}
-                  className="rounded-xl border border-neutral-800/80 shadow-sm shadow-black/20 bg-neutral-900/40 p-4 opacity-60"
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-xs text-neutral-500">
-                      Outdated — see newer version above · {formatDateTime(change.created_at)}
-                    </p>
-                    <StatusBadge status={change.status} />
-                  </div>
-                  <div className="mt-3 space-y-2">
-                    {(change.review_diff?.fields ?? change.diff?.fields ?? []).map((field, i) => (
-                      <DiffFieldView key={field.sourceKey + i} field={field} />
-                    ))}
-                  </div>
-                </section>
               ))}
             </div>
           );

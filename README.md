@@ -46,6 +46,8 @@ required — this dashboard does not need `STAGING_PAYLOAD_URL`, Payload credent
   grouped by source page, with per-row and bulk approve/reject actions.
 - **Recent Changes** — detected diffs (`change_events`) with previous/current field values and
   whether Payload blocked the change.
+- **Review Queue** — approve or reject each individual field/image. A page leaves the queue after
+  every row has a decision; only individually approved rows are sent to the next sync run.
 - **Templates** — saved block-structure stencils (`page_templates`).
 
 ## Safety notes

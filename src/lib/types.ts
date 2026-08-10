@@ -107,6 +107,7 @@ export interface ChangeDiff {
   fields?: DiffField[];
   sectionsAdded?: unknown[];
   sectionsRemoved?: unknown[];
+  decisions?: Record<string, "approved" | "rejected">;
 }
 
 export interface ChangeEvent {
