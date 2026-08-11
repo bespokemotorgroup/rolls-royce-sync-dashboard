@@ -4,9 +4,9 @@ A Next.js admin UI over the `rolls-royce-content-scraper` sync service's Postgre
 reviewing pending field mappings, watching sync runs, inspecting detected changes, and browsing
 saved page templates.
 
-This app talks **directly to the sync service's Postgres database** (via `pg`) from server-side
-code only. It does not call the sync service's API, Railway, or Payload — it only reads (and, for
-mapping approve/reject, writes a single `status` column) against the shared database.
+This app reads review data directly from the sync database. When the final field in a change is
+approved, it calls the authenticated sync-service API, which freshness-checks the official page,
+updates Payload, and publishes the staging document immediately.
 
 ## Setup
 
@@ -21,6 +21,8 @@ mapping approve/reject, writes a single `status` column) against the shared data
    - `DASHBOARD_PASSWORD` — the shared password for the login gate.
    - `AUTH_SECRET` — random secret used to sign the session cookie. Generate with
      `openssl rand -hex 32`.
+   - `SYNC_SERVICE_URL` — public URL of the always-on Railway sync service.
+   - `SYNC_ADMIN_TOKEN` — the same private admin token configured on that sync service.
 
 2. Install dependencies and run the dev server:
 
@@ -33,10 +35,9 @@ mapping approve/reject, writes a single `status` column) against the shared data
 
 ## Deploying to Vercel
 
-Set `SYNC_DATABASE_URL`, `DASHBOARD_PASSWORD`, and `AUTH_SECRET` as environment variables in the
-Vercel project settings, then deploy as a normal Next.js app. No other services or credentials are
-required — this dashboard does not need `STAGING_PAYLOAD_URL`, Payload credentials, or
-`SYNC_ADMIN_TOKEN`.
+Set `SYNC_DATABASE_URL`, `DASHBOARD_PASSWORD`, `AUTH_SECRET`, `SYNC_SERVICE_URL`, and
+`SYNC_ADMIN_TOKEN` in the Vercel project settings, then deploy as a normal Next.js app. Payload
+credentials remain only in the sync service and are never exposed to the dashboard client.
 
 ## Screens
 
@@ -46,8 +47,8 @@ required — this dashboard does not need `STAGING_PAYLOAD_URL`, Payload credent
   grouped by source page, with per-row and bulk approve/reject actions.
 - **Recent Changes** — detected diffs (`change_events`) with previous/current field values and
   whether Payload blocked the change.
-- **Review Queue** — approve or reject each individual field/image. A page leaves the queue after
-  every row has a decision; only individually approved rows are sent to the next sync run.
+- **Review Queue** — approve or reject each individual field/image. When every row has a decision,
+  approved rows publish immediately through the sync service and Payload.
 - **Templates** — saved block-structure stencils (`page_templates`).
 
 ## Safety notes
@@ -56,7 +57,5 @@ required — this dashboard does not need `STAGING_PAYLOAD_URL`, Payload credent
   `src/lib/auth.ts`) — every route except `/login` and `/api/login` requires a valid session.
 - `SYNC_DATABASE_URL` is only ever read in server-side code (`src/lib/db.ts`) — never sent to the
   client.
-- The only write path is `UPDATE field_mappings SET status = ...` (see
-  `src/app/(dashboard)/mappings/actions.ts`). There is no delete UI and no raw SQL console.
-- Triggering a sync run on demand is intentionally out of scope for v1 (the sync service runs as
-  a Railway Cron Job with no always-on API to call).
+- Publishing uses a server-only authenticated request to the sync service; `SYNC_ADMIN_TOKEN` is
+  never sent to the browser.

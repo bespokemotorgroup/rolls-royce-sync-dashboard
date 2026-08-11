@@ -4,6 +4,7 @@ import { ReviewCard } from "./ReviewCard";
 import { PageHeader } from "@/components/PageHeader";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 120;
 
 async function getQueue() {
   return query<ChangeEvent>(
@@ -34,8 +35,8 @@ export default async function ReviewPage() {
         description={
           <>
             {pendingCount} change{pendingCount === 1 ? "" : "s"} detected on the official site,
-            awaiting your approval before they publish. Nothing here goes live until you approve
-            it — approving only queues it for the next sync run.
+            awaiting your approval before they publish. Approving the final field immediately
+            updates the page through Payload.
           </>
         }
       />

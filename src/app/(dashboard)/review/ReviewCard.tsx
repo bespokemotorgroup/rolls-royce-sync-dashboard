@@ -11,6 +11,7 @@ export function ReviewCard({ change }: { change: ChangeEventRow }) {
   const [editing, setEditing] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [resolved, setResolved] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [decisions, setDecisions] = useState<Record<string, "approved" | "rejected">>(
     change.review_diff?.decisions ?? {},
   );
@@ -38,7 +39,9 @@ export function ReviewCard({ change }: { change: ChangeEventRow }) {
 
   function approve() {
     startTransition(async () => {
+      setActionError(null);
       const result = await approveChange(change.id);
+      if (result.error) setActionError(result.error);
       if (result.resolved) setResolved(true);
     });
   }
@@ -51,9 +54,11 @@ export function ReviewCard({ change }: { change: ChangeEventRow }) {
   }
 
   function decideField(sourceKey: string, decision: "approved" | "rejected") {
+    setActionError(null);
     setDecisions((previous) => ({ ...previous, [sourceKey]: decision }));
     startTransition(async () => {
       const result = await decideChangeField(change.id, sourceKey, decision);
+      if (result.error) setActionError(result.error);
       if (result.resolved) setResolved(true);
     });
   }
@@ -103,6 +108,11 @@ export function ReviewCard({ change }: { change: ChangeEventRow }) {
       </div>
 
       <div className="mt-3 space-y-2">
+        {actionError && (
+          <p className="rounded-md border border-red-900/70 bg-red-950/40 px-3 py-2 text-xs text-red-300">
+            Approved, but publishing failed: {actionError}
+          </p>
+        )}
         {fields.map((field, i) => (
           <FieldRow
             key={field.sourceKey + i}

@@ -3,6 +3,7 @@ import type { ChangeEvent } from "@/lib/types";
 import { formatDateTime } from "@/lib/format";
 import { DiffFieldView } from "@/components/DiffFieldView";
 import { PageHeader } from "@/components/PageHeader";
+import { retryPublish } from "../review/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -25,9 +26,8 @@ export default async function ApprovedPage() {
         title="Approved, awaiting publish"
         description={
           <>
-            Approved by a reviewer but not yet published — picked up on the next sync run (twice
-            weekly, or a manual trigger). The sync service re-checks the official page first; if
-            it changed again since approval, this moves to <em>superseded</em> instead of publishing.
+            Approval publishes immediately through Payload. Items remain here only when publishing
+            failed; use Retry publish after correcting the displayed error.
           </>
         }
       />
@@ -64,6 +64,16 @@ export default async function ApprovedPage() {
               </div>
 
               <div className="mt-3 space-y-2">
+                {change.error && (
+                  <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-red-900/70 bg-red-950/40 px-3 py-2">
+                    <p className="text-xs text-red-300">Publish failed: {change.error}</p>
+                    <form action={retryPublish.bind(null, change.id)}>
+                      <button className="rounded-md bg-red-500/15 px-3 py-1 text-xs font-medium text-red-300 hover:bg-red-500/25">
+                        Retry publish
+                      </button>
+                    </form>
+                  </div>
+                )}
                 {fields.map((field, i) => (
                   <DiffFieldView key={field.sourceKey + i} field={field} />
                 ))}
