@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { transaction } from "@/lib/db";
+import { queryOne, transaction } from "@/lib/db";
 import type { ChangeDiff } from "@/lib/types";
 
 type ReviewStatus = "pending_review" | "approved" | "rejected";
@@ -24,30 +24,21 @@ function revalidateAll() {
   revalidatePath("/");
 }
 
-async function publishThroughSyncService(id: string): Promise<void> {
-  const baseUrl = process.env.SYNC_SERVICE_URL?.replace(/\/$/, "");
-  const token = process.env.SYNC_ADMIN_TOKEN;
-  if (!baseUrl || !token) {
-    throw new Error("Immediate publishing is not configured. Set SYNC_SERVICE_URL and SYNC_ADMIN_TOKEN.");
+async function waitForPublication(id: string): Promise<void> {
+  for (let attempt = 0; attempt < 110; attempt += 1) {
+    const change = await queryOne<{ status: string; error: string | null }>(
+      `SELECT status, error FROM change_events WHERE id = $1`,
+      [id],
+    );
+    if (!change) throw new Error("The approved change no longer exists.");
+    if (change.status === "published" || change.status === "draft_updated") return;
+    if (change.error) throw new Error(change.error);
+    if (change.status !== "approved") {
+      throw new Error(`Publishing stopped with status: ${change.status}.`);
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1_000));
   }
-
-  const response = await fetch(`${baseUrl}/sync/changes/${encodeURIComponent(id)}/publish`, {
-    method: "POST",
-    headers: { "x-sync-token": token },
-    cache: "no-store",
-    signal: AbortSignal.timeout(110_000),
-  });
-  const text = await response.text();
-  let body: { published?: number; errors?: Array<{ error?: string }>; message?: string } = {};
-  try {
-    body = text ? JSON.parse(text) : {};
-  } catch {
-    // Keep the raw response below for a useful operator-facing error.
-  }
-  if (!response.ok) throw new Error(body.message ?? text ?? `Publisher returned ${response.status}`);
-  if (body.published !== 1) {
-    throw new Error(body.errors?.map((entry) => entry.error).filter(Boolean).join("; ") || "Payload did not publish the approved change.");
-  }
+  throw new Error("Approved successfully; the publisher is still processing this change.");
 }
 
 async function publishApproved(id: string, result: DecisionResult): Promise<DecisionResult> {
@@ -56,18 +47,11 @@ async function publishApproved(id: string, result: DecisionResult): Promise<Deci
     return result;
   }
   try {
-    await publishThroughSyncService(id);
+    await waitForPublication(id);
     revalidateAll();
     return { resolved: true, status: "published" };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    await transaction((client) =>
-      client.query(
-        `UPDATE change_events SET error = $1, updated_at = now()
-         WHERE id = $2 AND status = 'approved'`,
-        [message, id],
-      ).then(() => undefined),
-    );
     revalidateAll();
     return { resolved: true, status: "approved", error: message };
   }
@@ -189,5 +173,12 @@ export async function decideChangeField(
 }
 
 export async function retryPublish(id: string): Promise<void> {
+  await transaction((client) =>
+    client.query(
+      `UPDATE change_events SET error = NULL, updated_at = now()
+       WHERE id = $1 AND status = 'approved'`,
+      [id],
+    ).then(() => undefined),
+  );
   await publishApproved(id, { resolved: true, status: "approved" });
 }

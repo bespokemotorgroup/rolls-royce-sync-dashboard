@@ -5,8 +5,8 @@ reviewing pending field mappings, watching sync runs, inspecting detected change
 saved page templates.
 
 This app reads review data directly from the sync database. When the final field in a change is
-approved, it calls the authenticated sync-service API, which freshness-checks the official page,
-updates Payload, and publishes the staging document immediately.
+approved, that row becomes a publish job. The always-on sync service picks it up within seconds,
+freshness-checks the official page, updates Payload, and publishes the staging document.
 
 ## Setup
 
@@ -21,8 +21,6 @@ updates Payload, and publishes the staging document immediately.
    - `DASHBOARD_PASSWORD` — the shared password for the login gate.
    - `AUTH_SECRET` — random secret used to sign the session cookie. Generate with
      `openssl rand -hex 32`.
-   - `SYNC_SERVICE_URL` — public URL of the always-on Railway sync service.
-   - `SYNC_ADMIN_TOKEN` — the same private admin token configured on that sync service.
 
 2. Install dependencies and run the dev server:
 
@@ -35,9 +33,8 @@ updates Payload, and publishes the staging document immediately.
 
 ## Deploying to Vercel
 
-Set `SYNC_DATABASE_URL`, `DASHBOARD_PASSWORD`, `AUTH_SECRET`, `SYNC_SERVICE_URL`, and
-`SYNC_ADMIN_TOKEN` in the Vercel project settings, then deploy as a normal Next.js app. Payload
-credentials remain only in the sync service and are never exposed to the dashboard client.
+Set `SYNC_DATABASE_URL`, `DASHBOARD_PASSWORD`, and `AUTH_SECRET` in the Vercel project settings,
+then deploy as a normal Next.js app. Payload credentials remain only in the sync service.
 
 ## Screens
 
@@ -57,5 +54,5 @@ credentials remain only in the sync service and are never exposed to the dashboa
   `src/lib/auth.ts`) — every route except `/login` and `/api/login` requires a valid session.
 - `SYNC_DATABASE_URL` is only ever read in server-side code (`src/lib/db.ts`) — never sent to the
   client.
-- Publishing uses a server-only authenticated request to the sync service; `SYNC_ADMIN_TOKEN` is
-  never sent to the browser.
+- Vercel never receives Payload credentials or a sync admin token; the shared database carries
+  only the approved publish job and its result.
